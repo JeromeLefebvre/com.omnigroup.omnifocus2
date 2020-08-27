@@ -2,7 +2,7 @@
     "author": "Jerome Lefebvre",
     "targets": ["omnifocus"],
     "type": "action",
-    "identifier": "com.mycompany.ShowAlert",
+    "identifier": "com.mycompany.Increase",
     "version": "0.1",
     "description": "Increase the repeated task length",
     "label": "Increase",

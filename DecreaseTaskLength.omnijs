@@ -2,12 +2,12 @@
     "author": "Jerome Lefebvre",
     "targets": ["omnifocus"],
     "type": "action",
-    "identifier": "com.mycompany.ShowAlert",
+    "identifier": "com.mycompany.Decrease",
     "version": "0.1",
-    "description": "Increase the repeated task length",
-    "label": "Increase",
-    "mediumLabel": "Increase task length",
-    "paletteLabel": "Increase task length",
+    "description": "Decrease the repeated task length",
+    "label": "Decrease",
+    "mediumLabel": "Decrease task length",
+    "paletteLabel": "Decrease task length",
     "actions": [{
         "identifier": "myFirstAction",
         "image": "icon-filled-blue@2x.png"
@@ -27,7 +27,7 @@
         if (oldRuleString.contains("INTERVAL")) {
             const indexOfLastEqual = oldRuleString.lastIndexOf('=');
             const oldInterval = oldRuleString.substring(indexOfLastEqual + 1);
-            const newInterval = Math.floor(oldInterval*0.9) = 0 ? 1 : Math.floor(oldInterval*0.9);
+            const newInterval = Math.floor(oldInterval*0.9);
             newRuleString = oldRuleString.replace(oldInterval, newInterval);
         }
         else {
