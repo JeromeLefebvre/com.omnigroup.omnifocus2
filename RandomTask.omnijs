@@ -26,8 +26,10 @@
     }
 
     var action = new PlugIn.Action(function(selection) {
-        const homeTasks = tagsMatching("ホーム")[0]. availableTasks;
-        const task = randomBool() ? randomTask("ホーム") : randomTask("オフィス")
+        var task;
+        do {
+            task = randomBool() ? randomTask("ホーム") : randomTask("オフィス")
+        } while(!task);
         const taskUrl = "omnifocus:///task/" + task.id.primaryKey;
         URL.fromString(taskUrl).open();
     });
