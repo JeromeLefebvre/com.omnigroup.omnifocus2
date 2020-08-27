@@ -1,0 +1,48 @@
+/*{
+    "author": "Jerome Lefebvre",
+    "targets": ["omnifocus"],
+    "type": "action",
+    "identifier": "com.mycompany.ShowAlert",
+    "version": "0.1",
+    "description": "Increase the repeated task length",
+    "label": "Increase",
+    "mediumLabel": "Increase task length",
+    "paletteLabel": "Increase task length",
+    "actions": [{
+        "identifier": "myFirstAction",
+        "image": "icon-filled-blue@2x.png"
+        }
+     ]
+}*/
+(() => {
+    String.prototype.contains = function(substr) {
+        return this.indexOf(substr) > -1;
+      }
+
+    var action = new PlugIn.Action(function(selection) {
+        const task = selection.tasks[0];
+        const oldRuleString = task.repetitionRule.ruleString;
+        const repetitionMethod = task.repetitionRule.method;
+        var newRuleString = "";
+        if (oldRuleString.contains("INTERVAL")) {
+            const indexOfLastEqual = oldRuleString.lastIndexOf('=');
+            const oldInterval = oldRuleString.substring(indexOfLastEqual + 1);
+            const newInterval = Math.ceil(oldInterval*1.1);
+            newRuleString = oldRuleString.replace(oldInterval, newInterval);
+        }
+        else {
+            newRuleString = "FREQ=HOURLY;INTERVAL=2"
+        }
+        const newRule = new Task.RepetitionRule(newRuleString, repetitionMethod);
+        task.repetitionRule = newRule;
+        task.markComplete();
+    });
+
+    // If needed, uncomment, and add a function that returns true if the current selection is appropriate for the action.
+    action.validate = function(selection){
+        // check if a single task is selected and it has a repetition rule
+        return (selection.tasks.length == 1) && selection.tasks[0].repetitionRule;
+    };
+
+    return action;
+})();
