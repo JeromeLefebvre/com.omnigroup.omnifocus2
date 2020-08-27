@@ -1,0 +1,40 @@
+/*{
+    "author": "Jerome Lefebvre",
+    "targets": ["omnifocus"],
+    "type": "action",
+    "identifier": "com.mycompany.ShowRandom",
+    "version": "0.1",
+    "description": "Increase the repeated task length",
+    "label": "Random",
+    "mediumLabel": "Increase task length",
+    "paletteLabel": "Increase task length"
+}*/
+(() => {
+    Array.prototype.random = function() {
+        return this[Math.floor(Math.random() * this.length)];
+      }
+
+    function randomBool() {
+        return Math.round(Math.random());
+    }
+
+    function randomTask(tag) {
+        console.log(tag);
+        const tasks = tagsMatching(tag)[0]. availableTasks;
+        const task = tasks.random();
+        return task;
+    }
+
+    var action = new PlugIn.Action(function(selection) {
+        const homeTasks = tagsMatching("ホーム")[0]. availableTasks;
+        const task = randomBool() ? randomTask("ホーム") : randomTask("オフィス")
+        const taskUrl = "omnifocus:///task/" + task.id.primaryKey;
+        URL.fromString(taskUrl).open();
+    });
+
+    action.validate = function(selection){
+        // No need to validate as not using selection
+        return true;
+    };
+    return action;
+})();
