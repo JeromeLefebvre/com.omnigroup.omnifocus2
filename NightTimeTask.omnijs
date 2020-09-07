@@ -22,7 +22,7 @@
 
         tasksName.forEach(task =>
         {
-            var action = project.taskNamed(task) || new Task(task)
+            var action = project.taskNamed(task) || new Task(task, project)
             moveTasks([action], project)
             console.log(flattenedTags);
             action.addTags(flattenedTags)
