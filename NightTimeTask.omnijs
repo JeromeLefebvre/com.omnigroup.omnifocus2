@@ -23,9 +23,9 @@
         tasksName.forEach(task =>
         {
             var action = project.taskNamed(task) || new Task(task, project)
-            moveTasks([action], project)
-            console.log(flattenedTags);
-            action.addTags(flattenedTags)
+            //moveTasks([action], project)
+            //console.log(flattenedTags);
+            //action.addTags(flattenedTags)
         });
         document.windows[0].perspective = Perspective.BuiltIn.Projects
         document.windows[0].selectObjects([project])
