@@ -4,10 +4,10 @@
     "type": "action",
     "identifier": "com.mycompany.Decrease",
     "version": "0.1",
-    "description": "Decrease the repeated task length",
-    "label": "Decrease",
-    "mediumLabel": "Decrease task length",
-    "paletteLabel": "Decrease task length",
+    "description": "Increase the frequency of the repeated task length",
+    "label": "Increase Frequency",
+    "mediumLabel": "Increase task length",
+    "paletteLabel": "Increase task length",
     "actions": [{
         "identifier": "myFirstAction",
         "image": "icon-filled-blue@2x.png"
@@ -41,6 +41,7 @@
     // If needed, uncomment, and add a function that returns true if the current selection is appropriate for the action.
     action.validate = function(selection){
         // check if a single task is selected and it has a repetition rule
+
         return (selection.tasks.length == 1) && selection.tasks[0].repetitionRule;
     };
 

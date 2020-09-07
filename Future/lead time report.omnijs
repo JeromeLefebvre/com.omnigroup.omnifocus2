@@ -1,0 +1,37 @@
+/*{
+    "author": "Author Name",
+    "targets": ["omnifocus"],
+    "type": "action",
+    "identifier": "com.mycompany.lead time report",
+    "version": "0.1",
+    "description": "A plug-in that...",
+    "label": "lead time report",
+    "mediumLabel": "lead time report",
+    "paletteLabel": "lead time report",
+}*/
+(() => {
+    const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+    // a and b are javascript Date objects
+    function dateDiffInDays(a, b) {
+        // Discard the time and time-zone information.
+        const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+        const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+        return Math.floor((utc2 - utc1) / _MS_PER_DAY);
+    }
+    var action = new PlugIn.Action(function(selection) {
+        // Add code to run when the action is invoked
+        daysToComplete = dateDiffInDays(selection.tasks[0].completionDate, selection.tasks[0].added)
+        console.log("Invoked with selection", daysToComplete);
+        // Save output to csv https://www.omni-automation.com/omnifocus/taskpaper.html
+    });
+
+    // If needed, uncomment, and add a function that returns true if the current selection is appropriate for the action.
+    /*
+    action.validate = function(selection){
+
+    };
+    */
+
+    return action;
+})();

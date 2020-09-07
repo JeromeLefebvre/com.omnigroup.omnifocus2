@@ -3,11 +3,11 @@
     "targets": ["omnifocus"],
     "type": "action",
     "identifier": "com.mycompany.Increase",
-    "version": "0.1",
-    "description": "Increase the repeated task length",
-    "label": "Increase",
-    "mediumLabel": "Increase task length",
-    "paletteLabel": "Increase task length",
+    "version": "0.2",
+    "description": "Decrease the frequency of repeated task",
+    "label": "Decrease Freqeuncy",
+    "mediumLabel": "Decrease Freqeuncy",
+    "paletteLabel": "Decrease Freqeuncy",
     "actions": [{
         "identifier": "myFirstAction",
         "image": "icon-filled-blue@2x.png"

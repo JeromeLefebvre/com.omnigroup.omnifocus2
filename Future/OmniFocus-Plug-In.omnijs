@@ -1,0 +1,22 @@
+/*{
+	"type": "action",
+	"targets": ["omnifocus"],
+	"author": "Jerome Automator",
+	"identifier": "com.youOrCompany.of.clear-task-tags",
+	"version": "1.0",
+	"description": "This plug-in will clear the tags from the selected task(s)",
+	"label": "Clear Tags from Tasks",
+	"shortLabel": "Clear Task Tags"
+}*/
+(() => {
+var action = new PlugIn.Action(function(selection, sender){
+	selection.tasks.forEach(task => {task.clearTags()})
+
+	});
+
+action.validate = function(selection, sender){
+	return (selection.tasks.length > 0)
+};
+	
+return action;
+})();
