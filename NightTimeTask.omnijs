@@ -31,13 +31,9 @@
         document.windows[0].selectObjects([project])
     });
 
-    // If needed, uncomment, and add a function that returns true if the current selection is appropriate for the action.
-    /*
     action.validate = function(selection){
-        //should verify if it is late in the day, say after 4pm
+        // should verify if it is late in the day, say after 4pm
         return true;
     };
-    */
-
     return action;
 })();
