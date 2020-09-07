@@ -4,10 +4,10 @@
     "type": "action",
     "identifier": "com.mycompany.NightTimeTask",
     "version": "0.1",
-    "description": "A plug-in that...",
-    "label": "NightTimeTask",
-    "mediumLabel": "NightTimeTask",
-    "paletteLabel": "NightTimeTask",
+    "description": "Taks to Night Time Tasks",
+    "label": "NightTimeTasks",
+    "mediumLabel": "NightTimeTasks",
+    "paletteLabel": "NightTimeTasks",
 }*/
 (() => {
     var action = new PlugIn.Action(function(selection) {
@@ -18,14 +18,11 @@
         project.status = Project.Status.Active
         project.containsSingletonActions = true
 
-        const tasksName = ["Emtpy inbox", "clean up desk"];
+        const tasksName = ["Emtpy inbox", "Clean up desk", "Close all applications on laptop", "Reply to all emails"];
 
         tasksName.forEach(task =>
         {
             var action = project.taskNamed(task) || new Task(task, project)
-            //moveTasks([action], project)
-            //console.log(flattenedTags);
-            //action.addTags(flattenedTags)
         });
         document.windows[0].perspective = Perspective.BuiltIn.Projects
         document.windows[0].selectObjects([project])
