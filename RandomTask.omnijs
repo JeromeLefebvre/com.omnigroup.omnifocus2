@@ -19,7 +19,6 @@
     }
 
     function randomTask(tag) {
-        console.log(tag);
         const tasks = tagsMatching(tag)[0]. availableTasks;
         const task = tasks.random();
         return task;

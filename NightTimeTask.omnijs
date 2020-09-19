@@ -12,7 +12,6 @@
 (() => {
     var action = new PlugIn.Action(function(selection) {
         // Add code to run when the action is invoked
-        console.log("Invoked with selection", selection);
         projectName = "Night time"
         var project = projectNamed(projectName) || new Project(projectName)
         project.status = Project.Status.Active
