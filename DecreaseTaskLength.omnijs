@@ -2,48 +2,37 @@
     "author": "Jerome Lefebvre",
     "targets": ["omnifocus"],
     "type": "action",
-    "identifier": "com.mycompany.Decrease",
-    "version": "0.1",
-    "description": "Increase the frequency of the repeated task length",
+    "identifier": "com.mycompany.test",
+    "version": "0.2",
+    "description": "Increase the frequency of the selected repetable tasks",
     "label": "Increase Frequency",
-    "mediumLabel": "Increase task length",
-    "paletteLabel": "Increase task length",
-    "actions": [{
-        "identifier": "myFirstAction",
-        "image": "icon-filled-blue@2x.png"
-        }
-     ]
+    "mediumLabel": "Increase tasks frequency",
+    "paletteLabel": "Increase tasks frequency"
 }*/
 (() => {
-    String.prototype.contains = function(substr) {
-        return this.indexOf(substr) > -1;
-      }
-
     var action = new PlugIn.Action(function(selection) {
-        const task = selection.tasks[0];
-        const oldRuleString = task.repetitionRule.ruleString;
-        const repetitionMethod = task.repetitionRule.method;
-        var newRuleString = "";
-        if (oldRuleString.contains("INTERVAL")) {
-            const indexOfLastEqual = oldRuleString.lastIndexOf('=');
-            const oldInterval = oldRuleString.substring(indexOfLastEqual + 1);
-            const newInterval = Math.floor(oldInterval*0.9);
-            newRuleString = oldRuleString.replace(oldInterval, newInterval);
-        }
-        else {
-            newRuleString = "FREQ=HOURLY;INTERVAL=2"
-        }
-        const newRule = new Task.RepetitionRule(newRuleString, repetitionMethod);
-        task.repetitionRule = newRule;
-        task.markComplete();
+        selection.tasks.forEach(task => {
+            const oldRuleString = task.repetitionRule.ruleString;
+            const repetitionMethod = task.repetitionRule.method;
+            var newRuleString = "";
+            if (oldRuleString.indexOf("INTERVAL") > -1) {
+                const indexOfLastEqual = oldRuleString.lastIndexOf('=');
+                const oldInterval = oldRuleString.substring(indexOfLastEqual + 1);
+                const newInterval = Math.floor(oldInterval*0.9);
+                newRuleString = oldRuleString.replace(oldInterval, newInterval);
+            }
+            else {
+                newRuleString = "FREQ=HOURLY;INTERVAL=2"
+            }
+            const newRule = new Task.RepetitionRule(newRuleString, repetitionMethod);
+            task.repetitionRule = newRule;
+            task.markComplete();
+        });
     });
 
-    // If needed, uncomment, and add a function that returns true if the current selection is appropriate for the action.
     action.validate = function(selection){
-        // check if a single task is selected and it has a repetition rule
-
-        return (selection.tasks.length == 1) && selection.tasks[0].repetitionRule;
+        // Only works if all selected tasks are repeatable tasks
+        return selection.tasks.every(x => null !== x.repetitionRule);
     };
-
     return action;
 })();
