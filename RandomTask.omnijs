@@ -4,10 +4,10 @@
     "type": "action",
     "identifier": "com.mycompany.ShowRandom",
     "version": "0.1",
-    "description": "Increase the repeated task length",
+    "description": "Return a random task",
     "label": "Random",
-    "mediumLabel": "Increase task length",
-    "paletteLabel": "Increase task length"
+    "mediumLabel": "Random Task",
+    "paletteLabel": "Random Task"
 }*/
 (() => {
     Array.prototype.random = function() {
