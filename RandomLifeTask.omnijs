@@ -1,0 +1,42 @@
+/*{
+    "author": "Jerome Lefebvre",
+    "targets": ["omnifocus"],
+    "type": "action",
+    "identifier": "com.mycompany.ShowLifeRandom",
+    "version": "0.1",
+    "description": "Return a random life task",
+    "label": "Life Random",
+    "mediumLabel": "Random Life task length",
+    "paletteLabel": "Random Life task length"
+}*/
+(() => {
+    Array.prototype.random = function() {
+        return this[Math.floor(Math.random() * this.length)];
+      }
+
+    function randomBool() {
+        return Math.round(Math.random());
+    }
+
+    function randomTask(tag) {
+        const tasks = tagsMatching(tag)[0]. availableTasks;
+        const task = tasks.random();
+        return task;
+    }
+
+    var action = new PlugIn.Action(function(selection) {
+        var task;
+        do {
+            //task = randomBool() ? randomTask("ホーム") : randomTask("オフィス")
+            task = randomTask("ホーム")
+        } while(!task);
+        const taskUrl = "omnifocus:///task/" + task.id.primaryKey;
+        URL.fromString(taskUrl).open();
+    });
+
+    action.validate = function(selection){
+        // No need to validate as not using selection
+        return true;
+    };
+    return action;
+})();
