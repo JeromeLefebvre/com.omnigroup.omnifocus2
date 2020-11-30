@@ -5,9 +5,9 @@
     "identifier": "com.mycompany.Increase",
     "version": "0.2",
     "description": "Decrease the frequency of repeated task",
-    "label": "Decrease Freqeuncy",
-    "mediumLabel": "Decrease Freqeuncy",
-    "paletteLabel": "Decrease Freqeuncy",
+    "label": "Decrease Frequency",
+    "mediumLabel": "Decrease Frequency",
+    "paletteLabel": "Decrease Frequency",
     "actions": [{
         "identifier": "myFirstAction",
         "image": "icon-filled-blue@2x.png"
