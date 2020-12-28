@@ -19,7 +19,7 @@
     }
 
     function randomTask(tag) {
-        const tasks = tagsMatching(tag)[0]. availableTasks;
+        const tasks = tagsMatching(tag)[0].availableTasks;
         const task = tasks.random();
         return task;
     }
@@ -27,7 +27,7 @@
     var action = new PlugIn.Action(function(selection) {
         var task;
         do {
-            task = randomBool() ? randomTask("ホーム") : randomTask("オフィス")
+            task = randomBool() ? randomTask("Home") : randomTask("Office")
         } while(!task);
         const taskUrl = "omnifocus:///task/" + task.id.primaryKey;
         URL.fromString(taskUrl).open();
