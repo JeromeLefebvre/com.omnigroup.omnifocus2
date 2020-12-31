@@ -20,15 +20,39 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function tagsName(tags) {
+    var tagsName = [];
+    tags.forEach(tag => {
+        var tagName = tag.parent ? tag.parent.name + ":" : ""
+        tagName += tag.name,
+        tagsName.push(tagName);
+    });
+    return tagsName;
+}
+
+function existingTags() {
+    var existing = [];
+    tags.forEach(topTag => {
+        existing.push(topTag);
+        topTag.tags.forEach(childrenTag => {
+            existing.push(childrenTag);
+        });
+    });
+    return existing
+}
+
 (() => {
-    var action = new PlugIn.Action(function(selection) {
+    var action = new PlugIn.Action(function (selection) {
         var inputForm = new Form()
         var projectField = new Form.Field.String(
             "projectInput",
             "Name",
-            "new project" + getRandomInt(1,100)
+            "new project" + getRandomInt(1, 100)
         )
         inputForm.addField(projectField)
+
+
+        console.log(tags)
 
         var goalField = new Form.Field.String(
             "goalInput",
@@ -37,11 +61,16 @@ function getRandomInt(min, max) {
         )
         inputForm.addField(goalField)
 
-        var tagField = new Form.Field.String(
+        var tagsAsFlatList = existingTags();
+
+        var tagField = new Form.Field.Option(
             "tagInput",
-            "Tag",
-            "Home"
+            "Tags",
+            tagsAsFlatList,
+            tagsName(tagsAsFlatList),
+            tagsAsFlatList[1]
         )
+
         inputForm.addField(tagField)
 
         var taskField = new Form.Field.String(
@@ -56,47 +85,35 @@ function getRandomInt(min, max) {
 
         inputForm.validate = function (formObject) {
             // TODO:
+            console.log(formObject.values["projectInput"]);
+            console.log(formObject.values["tagInput"]);
+
             return true
         }
 
         formPromise.then(function (formObject) {
             var projectName = formObject.values["projectInput"];
-            
+
             var project = projectNamed(projectName) || new Project(projectName);
             project.status = Project.Status.Active;
             project.containsSingletonActions = false;
-            var tag = tagNamed(formObject.values["tagInput"])
-            project.addTag(tag)
+            var tag = formObject.values["tagInput"];
+            console.log("tag selected:");
+            console.log(tag);
+            project.addTag(tag);
             project.note = "Goal: " + formObject.values["goalInput"]
             var task = formObject.values["taskInput"];
             var action = project.taskNamed(task) || new Task(task, project)
             project.
-            document.windows[0].perspective = Perspective.BuiltIn.Projects
+                document.windows[0].perspective = Perspective.BuiltIn.Projects
             document.windows[0].selectObjects([project])
         })
-        formPromise.catch(function(err){
-			console.log("form cancelled", err.message)
+        formPromise.catch(function (err) {
+            console.log("form cancelled", err.message)
         })
-        /*
-        projectName = "Night time"
-        var project = projectNamed(projectName) || new Project(projectName)
-        project.status = Project.Status.Active
-        project.containsSingletonActions = true
-
-        const tasksName = ["Emtpy inbox", "Clean up physical desk", "Close all applications on laptop", "Inbox Zero"];
-
-        tasksName.forEach(task =>
-        {
-            var action = project.taskNamed(task) || new Task(task, project)
-        });
-        document.windows[0].perspective = Perspective.BuiltIn.Projects
-        document.windows[0].selectObjects([project])
-
-        */
-        
     });
 
-    action.validate = function(selection){
+    action.validate = function (selection) {
         return true;
     };
     return action;
