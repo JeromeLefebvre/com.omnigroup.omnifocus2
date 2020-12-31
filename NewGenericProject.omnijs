@@ -46,7 +46,7 @@ function existingTags() {
         var inputForm = new Form()
         var projectField = new Form.Field.String(
             "projectInput",
-            "Name",
+            "Project Name",
             "new project" + getRandomInt(1, 100)
         )
         inputForm.addField(projectField)
@@ -56,7 +56,7 @@ function existingTags() {
 
         var goalField = new Form.Field.String(
             "goalInput",
-            "Goal",
+            "Goal (completed when..)",
             "I want to..."
         )
         inputForm.addField(goalField)
@@ -75,7 +75,7 @@ function existingTags() {
 
         var taskField = new Form.Field.String(
             "taskInput",
-            "Task",
+            "First Task",
             "I first need to.."
         )
         inputForm.addField(taskField)
