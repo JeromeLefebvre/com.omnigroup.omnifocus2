@@ -41,6 +41,27 @@ function existingTags() {
     return existing
 }
 
+function foldersName(folders) {
+    var foldersName = [];
+    folders.forEach(folder => {
+        //var tagName = tag.parent ? tag.parent.name + ":" : ""
+        //tagName += tag.name,
+        foldersName.push(folder.name);
+    });
+    return foldersName;
+}
+
+function existingFolders() {
+    var existing = [];
+    folders.forEach(folder => {
+        existing.push(folder);
+        /*topTag.tags.forEach(childrenTag => {
+            existing.push(childrenTag);
+        });*/
+    });
+    return existing
+}
+
 (() => {
     var action = new PlugIn.Action(function (selection) {
         var inputForm = new Form()
@@ -62,7 +83,6 @@ function existingTags() {
         inputForm.addField(goalField)
 
         var tagsAsFlatList = existingTags();
-
         var tagField = new Form.Field.Option(
             "tagInput",
             "Tags",
@@ -70,8 +90,17 @@ function existingTags() {
             tagsName(tagsAsFlatList),
             tagsAsFlatList[1]
         )
+        inputForm.addField(tagField);
 
-        inputForm.addField(tagField)
+        var foldersAsFlatList = existingFolders();
+        var folderField = new Form.Field.Option(
+            "folderInput",
+            "Folder",
+            foldersAsFlatList,
+            foldersName(foldersAsFlatList),
+            foldersAsFlatList[1]
+        )
+        inputForm.addField(folderField);
 
         var taskField = new Form.Field.String(
             "taskInput",
@@ -85,27 +114,23 @@ function existingTags() {
 
         inputForm.validate = function (formObject) {
             // TODO:
-            console.log(formObject.values["projectInput"]);
-            console.log(formObject.values["tagInput"]);
-
             return true
         }
 
         formPromise.then(function (formObject) {
             var projectName = formObject.values["projectInput"];
+            var folder = formObject.values["folderInput"];
 
-            var project = projectNamed(projectName) || new Project(projectName);
+            var project = folder.projectNamed(projectName) || new Project(projectName, folder);
             project.status = Project.Status.Active;
             project.containsSingletonActions = false;
             var tag = formObject.values["tagInput"];
-            console.log("tag selected:");
-            console.log(tag);
             project.addTag(tag);
             project.note = "Goal: " + formObject.values["goalInput"]
             var task = formObject.values["taskInput"];
-            var action = project.taskNamed(task) || new Task(task, project)
-            project.
-                document.windows[0].perspective = Perspective.BuiltIn.Projects
+            new Task(task, project);
+            new Task("Create project in toggl", project);
+            project.document.windows[0].perspective = Perspective.BuiltIn.Projects
             document.windows[0].selectObjects([project])
         })
         formPromise.catch(function (err) {
