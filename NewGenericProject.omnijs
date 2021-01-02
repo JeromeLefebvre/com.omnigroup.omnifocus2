@@ -10,10 +10,12 @@
 }*/
 
 /*
-Built from a skelton taken from: 
+Built from a skelton taken from:
 https://omni-automation.com/ofac/index.html
-
 */
+
+var DEBUG = true;
+
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -25,7 +27,7 @@ function tagsName(tags) {
     tags.forEach(tag => {
         var tagName = tag.parent ? tag.parent.name + ":" : ""
         tagName += tag.name,
-        tagsName.push(tagName);
+            tagsName.push(tagName);
     });
     return tagsName;
 }
@@ -72,9 +74,7 @@ function existingFolders() {
         )
         inputForm.addField(projectField)
 
-
-        console.log(tags)
-
+        // GOAL
         var goalField = new Form.Field.String(
             "goalInput",
             "Goal (completed when..)",
@@ -82,6 +82,7 @@ function existingFolders() {
         )
         inputForm.addField(goalField)
 
+        // TAGS
         var tagsAsFlatList = existingTags();
         var tagField = new Form.Field.Option(
             "tagInput",
@@ -92,6 +93,7 @@ function existingFolders() {
         )
         inputForm.addField(tagField);
 
+        // FOLDER
         var foldersAsFlatList = existingFolders();
         var folderField = new Form.Field.Option(
             "folderInput",
@@ -102,12 +104,22 @@ function existingFolders() {
         )
         inputForm.addField(folderField);
 
+        // TASK
         var taskField = new Form.Field.String(
             "taskInput",
             "First Task",
             "I first need to.."
         )
         inputForm.addField(taskField)
+
+        // REFERENCE
+        var referenceField = new Form.Field.String(
+            "referenceInput",
+            "Reference Link",
+            "/Users/jeromelefebvre/Documents/Finance/Taxes\ Japan/2021"
+            //"vscode://file/..."
+        )
+        inputForm.addField(referenceField)
 
         formPrompt = "Create a new project"
         formPromise = inputForm.show(formPrompt, "Continue")
@@ -118,6 +130,7 @@ function existingFolders() {
         }
 
         formPromise.then(function (formObject) {
+            console.log("New project will be created");
             var projectName = formObject.values["projectInput"];
             var folder = formObject.values["folderInput"];
 
@@ -125,11 +138,37 @@ function existingFolders() {
             project.status = Project.Status.Active;
             project.containsSingletonActions = false;
             var tag = formObject.values["tagInput"];
+
             project.addTag(tag);
-            project.note = "Goal: " + formObject.values["goalInput"]
+            project.note = "Goal: " + formObject.values["goalInput"];
+
+            var referenceURL = formObject.values["referenceInput"];
+
+            if (referenceURL) {
+                // VS Code project folder
+                if (referenceURL.startsWith("vscode")) {
+                    var param = encodeURIComponent(referenceURL.split("vscode://file/")[1])
+                    referenceURL = "vscode://file/" + param;
+                    project.note += "\n\nReference: " + referenceURL;
+                }
+                // Mac folder
+                else if (referenceURL.startsWith("/")) {
+                    if (DEBUG) {
+                        console.log("Folder link added with:", referenceURL);
+                    }
+                    var path = "file://" + referenceURL.replace(" ", "%20");
+                    console.log(path);
+                    var url = URL.fromString(path);
+                    if (DEBUG) {
+                        console.log(url.string);
+                    }
+                    project.note += "\n\nReference:\n"
+                    project.addLinkedFileURL(url)
+                }
+            }
             var task = formObject.values["taskInput"];
-            new Task(task, project);
             new Task("Create project in toggl", project);
+            new Task(task, project);
             project.document.windows[0].perspective = Perspective.BuiltIn.Projects
             document.windows[0].selectObjects([project])
         })
