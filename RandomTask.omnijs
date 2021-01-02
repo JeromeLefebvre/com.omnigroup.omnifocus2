@@ -10,30 +10,55 @@
     "paletteLabel": "Random Task"
 }*/
 (() => {
-    Array.prototype.random = function() {
+    Array.prototype.random = function () {
         return this[Math.floor(Math.random() * this.length)];
-      }
-
-    function randomBool() {
-        return Math.round(Math.random());
     }
 
-    function randomTask(tag) {
-        const tasks = tagsMatching(tag)[0].availableTasks;
-        const task = tasks.random();
-        return task;
-    }
+    function randomTask(tagName) {
+        // Select a random tag
 
-    var action = new PlugIn.Action(function(selection) {
-        var task;
         do {
-            task = randomBool() ? randomTask("Home") : randomTask("Office")
-        } while(!task);
-        const taskUrl = "omnifocus:///task/" + task.id.primaryKey;
-        URL.fromString(taskUrl).open();
+            var tag = tagsMatching(tagName).random();
+        } while (tag.availableTasks.length == 0)
+
+        // return a random task
+        return tag.availableTasks.random();
+    }
+
+    var action = new PlugIn.Action(function (selection) {
+        var inputForm = new Form()
+        const tags = [tagsMatching("Home")[0], tagsMatching("Office")[0]];
+        const tagsName = ["Home", "Office"];
+
+        var tagField = new Form.Field.Option(
+            "tagInput",
+            "Tag",
+            tags,
+            tagsName,
+            tags[0]
+        );
+        inputForm.addField(tagField);
+
+        formPrompt = "Select a random task";
+        formPromise = inputForm.show(formPrompt, "Continue");
+
+        inputForm.validate = function (formObject) {
+            // TODO:
+            return true
+        }
+
+        formPromise.then(function (formObject) {
+
+            var tag = formObject.values["tagInput"];
+            console.log(tag);
+            var task = randomTask(tag.name);
+            const taskUrl = "omnifocus:///task/" + task.id.primaryKey;
+            URL.fromString(taskUrl).open();
+        });
+
     });
 
-    action.validate = function(selection){
+    action.validate = function (selection) {
         // No need to validate as not using selection
         return true;
     };

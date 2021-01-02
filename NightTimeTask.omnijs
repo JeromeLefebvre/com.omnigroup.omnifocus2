@@ -16,7 +16,7 @@
         var project = projectNamed(projectName) || new Project(projectName)
         project.status = Project.Status.Active
         project.containsSingletonActions = true
-
+        
         const tasksName = ["Emtpy inbox", "Clean up physical desk", "Close all applications on laptop", "Inbox Zero"];
 
         tasksName.forEach(task =>
