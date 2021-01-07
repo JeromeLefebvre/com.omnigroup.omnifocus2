@@ -156,7 +156,7 @@ function existingFolders() {
                     if (DEBUG) {
                         console.log("Folder link added with:", referenceURL);
                     }
-                    var path = "file://" + referenceURL.replace(" ", "%20");
+                    var path = "file://" + referenceURL.replaceAll(" ", "%20");
                     console.log(path);
                     var url = URL.fromString(path);
                     if (DEBUG) {
