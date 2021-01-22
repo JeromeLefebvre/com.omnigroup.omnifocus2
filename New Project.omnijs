@@ -1,0 +1,213 @@
+/*{
+    "type": "action",
+    "targets": ["omnifocus"],
+    "author": "Jerome Lefebvre",
+    "identifier": "com.jpl.newProject",
+    "version": "0.1",
+    "description": "Create a new project",
+    "label": "New Templated Project",
+    "shortLabel": "New Templated Project"
+}*/
+var DEBUG = true;
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function isFile(pathname) {
+    return pathname.split('/').pop().indexOf('.') > -1;
+}
+
+function tagsName(tags) {
+    var tagsName = [];
+    tags.forEach(tag => {
+        var tagName = tag.parent ? tag.parent.name + ":" : ""
+        tagName += tag.name,
+            tagsName.push(tagName);
+    });
+    return tagsName;
+}
+
+function existingTags() {
+    var existing = [];
+    tags.forEach(topTag => {
+        existing.push(topTag);
+        topTag.tags.forEach(childrenTag => {
+            existing.push(childrenTag);
+        });
+    });
+    return existing
+}
+
+function existingFolders() {
+    var existing = []
+    folderNamed("Life").folders.forEach( folder => existing.push(folder));
+    var OSIsoftFolder = folderNamed("OSIsoft")
+    existing.push(OSIsoftFolder.folderNamed("OSIsoft"))
+    existing.push(OSIsoftFolder.folderNamed("Training"))
+    OSIsoftFolder.folderNamed("Customers").folders.forEach(folder => existing.push(folder))
+    return existing
+}
+
+(() => {
+    var action = new PlugIn.Action(function (selection) {
+        const inputForm = new Form()
+        const projectField = new Form.Field.String(
+            "projectInput",
+            "Project Name",
+            "new project" + getRandomInt(1, 100)
+        )
+        inputForm.addField(projectField)
+
+        // GOAL
+        const goalField = new Form.Field.String(
+            "goalInput",
+            "Goal (completed when..)",
+            "I want to..."
+        )
+        inputForm.addField(goalField)
+
+        // TAGS
+        const tagsAsFlatList = existingTags();
+        const tagField = new Form.Field.Option(
+            "tagInput",
+            "Tags",
+            tagsAsFlatList,
+            tagsName(tagsAsFlatList),
+            tagsAsFlatList[1]
+        )
+        inputForm.addField(tagField);
+
+        // FOLDER
+        const foldersAsFlatList = existingFolders();
+        const folderField = new Form.Field.Option(
+            "folderInput",
+            "Folder",
+            foldersAsFlatList,
+            foldersAsFlatList.map(folder => folder.name),
+            foldersAsFlatList[1]
+        )
+        inputForm.addField(folderField);
+
+        // If new customer
+        const newCustomerField = new Form.Field.String(
+            "newCustomerInput",
+            "New Customer",
+            null
+        )
+        inputForm.addField(newCustomerField)
+                
+        // TASK
+        const tasksField = new Form.Field.String(
+            "taskInput",
+            "First Task",
+            `task1
+
+
+
+
+`
+        )
+        inputForm.addField(tasksField)
+
+        // REFERENCE
+        const referenceField = new Form.Field.String(
+            "referenceInput",
+            "Reference Link",
+            "/Users/jeromelefebvre/"
+            //"vscode://file/..."
+        )
+        inputForm.addField(referenceField)
+
+        formPrompt = "Create a new project"
+        formPromise = inputForm.show(formPrompt, "Continue")
+
+        inputForm.validate = function (formObject) {
+
+            const {projectInput, folderInput, newCustomerInput} = formObject.values;
+            const noExistingProject = folderInput.projectNamed(projectInput) == null;
+            console.info("The selected folder is : " + folderInput.name)
+            var whenNewCustomerCreated = (folderInput.name != ".") || newCustomerInput
+            return noExistingProject && whenNewCustomerCreated
+        }
+
+        formPromise.then(function (formObject) {
+            console.info("New project will be created");
+            
+            const {projectInput, folderInput, newCustomerInput} = formObject.values;
+            var folder = formObject.values["folderInput"];
+
+            if (folder.name == ".") {
+                const newCustomerName = formObject.values["newCustomerInput"]
+                // need to create new customer folder
+                folder = new Folder(newCustomerName, folder.parent)
+            }
+            const project = new Project(projectInput, folderInput);
+            project.status = Project.Status.Active;
+            project.containsSingletonActions = false;
+            var tag = formObject.values["tagInput"];
+
+            project.addTag(tag);
+            project.note = "Goal: " + formObject.values["goalInput"];
+
+            var referenceURL = formObject.values["referenceInput"];
+
+            if (referenceURL) {
+                // VS Code project folder
+                if (referenceURL.startsWith("vscode")) {
+                    var param = encodeURIComponent(referenceURL.split("vscode://file/")[1])
+                    referenceURL = "vscode://file/" + param;
+                    project.note += "\n\nReference: " + referenceURL;
+                }
+                // Mac folder or file
+                else if (referenceURL.startsWith("/")) {
+                    console.info("Creating an alias to: " + referenceURL)
+                    // To create a valid path to a folder
+                    // 1. Need to remove all spaces
+                    var path = "file://" + referenceURL.replaceAll(" ", "%20")
+                    // 2. Make sure it doesn't end with EOL
+                    path = path.trimEnd()
+                    // 3. If it is a folder, it needs to end with a slash
+                    if (!isFile(path) && path.slice(path.length - 1) != "/") {
+                        path += "/"
+                    }
+                    console.info("The path will be " + path)
+                    const url = URL.fromString(path)
+                    console.info("The url created is: " + url)
+                    project.note += "\n\nReference:\n"
+                    project.note += path
+                    try {
+                        project.addLinkedFileURL(url)
+                    }
+                    catch (error){
+                        console.error(error.message)
+                    }
+                }
+            }
+            // Create new tasks here:
+            //const toggl = new Task("Create project in toggl", project);
+            var tasksList = formObject.values["taskInput"];
+
+            const tasksName = tasksList.split("\n");
+            tasksName.forEach(task => {
+                if (task != "")
+                    new Task(task, project)
+            });
+            project.document.windows[0].perspective = Perspective.BuiltIn.Projects
+            document.windows[0].selectObjects([project]);
+            const taskUrl = "omnifocus:///task/" + toggl.id.primaryKey;
+            URL.fromString(taskUrl).open();
+
+        })
+        formPromise.catch(function (err) {
+            console.log("form cancelled", err.message)
+        })
+    });
+
+    action.validate = function (selection) {
+        return true;
+    };
+    return action;
+})();

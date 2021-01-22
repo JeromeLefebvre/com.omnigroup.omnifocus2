@@ -1,0 +1,67 @@
+/*{
+    "author": "Jerome Lefebvre",
+    "targets": ["omnifocus"],
+    "type": "action",
+    "identifier": "com.mycompany.ShowRandom",
+    "version": "0.3",
+    "description": "Return a random task",
+    "label": "Random Task",
+    "shortLabel": "Random Task"
+}*/
+(() => {
+    Array.prototype.random = function () {
+        return this[Math.floor(Math.random() * this.length)];
+    }
+
+    function selectAndShowRandomTask(tagName) {
+        const task = randomTask(tagName)
+        const taskUrl = "omnifocus:///task/" + task.id.primaryKey
+        console.info("Opening: " + taskUrl)
+        URL.fromString(taskUrl).open()
+    }
+
+    function randomTask(tagName) {
+        // Select a random tag
+        const tag = tagsMatching(tagName).filter(tag => tag.availableTasks.length).random()
+        // return a random task
+        console.info("Randomly selected tag: " + tag.name)
+        const task = tag.availableTasks.random()
+        console.info("Randomly selected task: " + task.name)
+        return task
+    }
+
+    const action = new PlugIn.Action(function (selection) {
+        const availableTags = tags.filter(tag => tag.availableTasks.length)
+        // Ask user to pick a task only if there are more than one tag available
+        if (availableTags.length > 1) {
+            const inputForm = new Form()
+            const tagField = new Form.Field.Option(
+                "tagInput",
+                "Select a tag",
+                availableTags,
+                availableTags.map(tag => tag.name),
+                tags[0]
+            );
+            inputForm.addField(tagField);
+
+            formPrompt = "Select a random task"
+            formPromise = inputForm.show(formPrompt, "Continue")
+
+            inputForm.validate = function (formObject) {
+                // We've already validated that a tag had available tasks
+                return true
+            }
+
+            formPromise.then(function (formObject) {
+                const tag = formObject.values["tagInput"];
+                console.info("User Selected tag " + tag.name);
+                selectAndShowRandomTask(tag.name);
+            });
+        }
+        else {
+            console.info("Only Available Tag " + availableTags[0].name);
+            selectAndShowRandomTask(availableTags[0].name);
+        }
+    });
+    return action;
+})();
