@@ -8,7 +8,6 @@
     "label": "New Templated Project",
     "shortLabel": "New Templated Project"
 }*/
-var DEBUG = true;
 
 function getRandomInt(min, max) {
     min = Math.ceil(min);
@@ -120,7 +119,7 @@ function existingFolders() {
             //"vscode://file/..."
         )
         inputForm.addField(referenceField)
-
+        
         formPrompt = "Create a new project"
         formPromise = inputForm.show(formPrompt, "Continue")
 
@@ -128,7 +127,7 @@ function existingFolders() {
 
             const {projectInput, folderInput, newCustomerInput} = formObject.values;
             const noExistingProject = folderInput.projectNamed(projectInput) == null;
-            console.info("The selected folder is : " + folderInput.name)
+            //console.info("The selected folder is : " + folderInput.name)
             var whenNewCustomerCreated = (folderInput.name != ".") || newCustomerInput
             return noExistingProject && whenNewCustomerCreated
         }
@@ -136,20 +135,20 @@ function existingFolders() {
         formPromise.then(function (formObject) {
             console.info("New project will be created");
             
-            const {projectInput, folderInput, newCustomerInput} = formObject.values;
-            var folder = formObject.values["folderInput"];
+            const {projectInput, folderInput, newCustomerInput, tagInput} = formObject.values;
+            var folder = folderInput;
 
-            if (folder.name == ".") {
-                const newCustomerName = formObject.values["newCustomerInput"]
+            if (newCustomerInput) {
+                console.info(`A new customer will be created with name: ${newCustomerInput}`)
                 // need to create new customer folder
-                folder = new Folder(newCustomerName, folder.parent)
+                f
+                folder = new Folder(newCustomerInput, customerFolder)
             }
-            const project = new Project(projectInput, folderInput);
+            const project = new Project(projectInput, folder);
             project.status = Project.Status.Active;
             project.containsSingletonActions = false;
-            var tag = formObject.values["tagInput"];
 
-            project.addTag(tag);
+            project.addTag(tagInput);
             project.note = "Goal: " + formObject.values["goalInput"];
 
             var referenceURL = formObject.values["referenceInput"];
@@ -195,11 +194,11 @@ function existingFolders() {
                 if (task != "")
                     new Task(task, project)
             });
+            
             project.document.windows[0].perspective = Perspective.BuiltIn.Projects
             document.windows[0].selectObjects([project]);
             const taskUrl = "omnifocus:///task/" + toggl.id.primaryKey;
             URL.fromString(taskUrl).open();
-
         })
         formPromise.catch(function (err) {
             console.log("form cancelled", err.message)

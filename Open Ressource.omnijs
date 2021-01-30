@@ -9,16 +9,13 @@
     "mediumLabel": "Open Ressource",
     "paletteLabel": "Open Ressource",
 }*/
+//@ts-check
 (() => {
-    var action = new PlugIn.Action(function(selection) {
-        // Tries to open one of the following links
-        // 1. attached to the task
-        // 2. attached to the parent project or project if that is what is selected
-        
-        const {tasks, projects} = selection
+    var action = new this.PlugIn.Action(function (selection) {
+        const { tasks, projects } = selection
         const [task, ...otherTasks] = tasks
-        const [project=task.parent, ...otherProjects] = projects
-
+        const [project = task.parent, ...otherProjects] = projects
+        // First check anything directly attached to a task
         if (task) {
             if (task && task.linkedFileURLs.length) {
                 task.linkedFileURLs[0].open()
@@ -30,46 +27,49 @@
                 return
             }
         }
+        // Next check anything directly attached to a project
         if (project) {
             if (project.linkedFileURLs.length) {
                 project.linkedFileURLs[0].open()
                 return
             }
         }
-        //const re = /\b(?:https?:\/\/)(\S+)\b/g
+        
         const re = /(\b(https?|ftp|file|omnifocus):\/\/\/?[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+        // finally parse either the task or the project's notes
         if (task.note && re.test(task.note)) {
             const link = task.note.match(re)[0]
-            const url = URL.fromString(link)
+            const url = this.URL.fromString(link)
             url.open()
             return
         }
         if (project.note && re.test(project.note)) {
             const link = project.note.match(re)[0]
-            const url = URL.fromString(link)
+            const url = this.URL.fromString(link)
             url.open()
             return
         }
     });
 
-    action.validate = function(selection){        
+    action.validate = function (selection) {
         // tasks or projects can both be null, e.g. a folder is selected
-        const {tasks, projects} = selection
-        console.info(selection.projects)
+        const { tasks, projects } = selection
+
         if (!tasks.length && !projects.length)
             return false
-        console.info(tasks)
-        console.info(projects)
+
+        
+        
         const [task, ...otherTasks] = tasks
-        const [project=task.parent, ...otherProjects] = projects        
+        const [project = task.parent, ...otherProjects] = projects
         // to check if there are any https links in a string
         const re = /(\b(https?|ftp|file|omnifocus):\/\/\/?[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-        
-        return (task && task.linkedFileURLs.length) || 
-               (task && task.parent && task.parent.linkedFileURLs.length) || 
-               (task && task.note && re.test(task.note)) ||
-               (project && project.linkedFileURLs.length) ||
-               (project && project.note && re.test(project.note))
+
+        return (task?.linkedFileURLs.length) ||
+            (task?.parent?.linkedFileURLs.length) ||
+            (task?.note && re.test(task.note)) ||
+            (project?.linkedFileURLs.length) ||
+            (project?.note && re.test(project.note))
     };
     return action;
 })();
