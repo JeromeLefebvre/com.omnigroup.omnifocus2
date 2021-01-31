@@ -1,5 +1,7 @@
 {
     "compilerOptions": {
-        "lib": ["es7"]
+      "module": "commonjs",
+      "target": "es6",
+      "checkJs": true
     }
-}
+  }
