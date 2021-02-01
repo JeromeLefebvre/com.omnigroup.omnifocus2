@@ -12,43 +12,21 @@
 
 (() => {
     var action = new PlugIn.Action(function (selection) {
-        const { tasks, projects } = selection
+        const {tasks, projects} = selection
         const [task, ...otherTasks] = tasks
         const [project = task.parent, ...otherProjects] = projects
-        // First check anything directly attached to a task
-        if (task) {
-            if (task && task.linkedFileURLs.length) {
-                task.linkedFileURLs[0].open()
-                return
-            }
-            const taskProject = task.parent
-            if (taskProject.linkedFileURLs.length) {
-                taskProject.linkedFileURLs[0].open()
-                return
-            }
-        }
-        // Next check anything directly attached to a project
-        if (project) {
-            if (project.linkedFileURLs.length) {
-                project.linkedFileURLs[0].open()
-                return
-            }
-        }
+        // First check anything directly attached to a task or project
+        task?.linkedFileURLs.forEach(url => url.open())
+        project?.linkedFileURLs.forEach(url => url.open())
         
         const re = /(\b(https?|ftp|file|omnifocus):\/\/\/?[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
         // finally parse either the task or the project's notes
-        if (task.note && re.test(task.note)) {
-            const link = task.note.match(re)[0]
-            const url = URL.fromString(link)
-            url.open()
-            return
-        }
-        if (project.note && re.test(project.note)) {
-            const link = project.note.match(re)[0]
-            const url = URL.fromString(link)
-            url.open()
-            return
-        }
+        task?.note.match(re)?.forEach(link =>
+            URL.fromString(link).open()
+        )
+        project?.note.match(re)?.forEach(link =>
+            URL.fromString(link).open()
+        )
     });
 
     action.validate = function (selection) {
@@ -57,7 +35,7 @@
 
         if (!tasks.length && !projects.length)
             return false
-        console.info
+        
         const [task, ...otherTasks] = tasks
         const [project = task.parent, ...otherProjects] = projects
         // to check if there are any https links in a string
