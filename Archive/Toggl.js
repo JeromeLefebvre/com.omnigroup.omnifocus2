@@ -87,3 +87,29 @@ function createToggl(customer, project) {
     createClient(customer).then(id => createProject(id, project));    
 }
 /// TOGGL intergration
+
+    dependencyLibrary.startTogglTimer = async function startTogglTimer(
+        timeEntry,
+    ) {
+        const fetchRequest = new URL.FetchRequest();
+        fetchRequest.bodyData = Data.fromString(
+        JSON.stringify({
+            time_entry: timeEntry,
+        }),
+        );
+        fetchRequest.method = 'POST';
+        fetchRequest.headers = {
+        Authorization: AuthHeader,
+        'Content-Type': 'application/json',
+        };
+        fetchRequest.url = URL.fromString(
+        'https://www.toggl.com/api/v8/time_entries/start',
+        );
+        const r = await fetchRequest.fetch();
+
+        if (r.statusCode !== 200) {
+        throw buildErrorObject(r);
+        }
+
+        return JSON.parse(r.bodyString).data;
+    };

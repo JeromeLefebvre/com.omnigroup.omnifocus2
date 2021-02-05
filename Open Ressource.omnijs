@@ -11,6 +11,8 @@
 }*/
 
 (() => {
+    const re = /(\b(https?|ftp|file|omnifocus|facetime):\/\/\/?[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+
     var action = new PlugIn.Action(function (selection) {
         const {tasks, projects} = selection
         const [task, ...otherTasks] = tasks
@@ -19,7 +21,6 @@
         task?.linkedFileURLs.forEach(url => url.open())
         project?.linkedFileURLs.forEach(url => url.open())
         
-        const re = /(\b(https?|ftp|file|omnifocus):\/\/\/?[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
         // finally parse either the task or the project's notes
         task?.note.match(re)?.forEach(link =>
             URL.fromString(link).open()
@@ -39,7 +40,7 @@
         const [task, ...otherTasks] = tasks
         const [project = task.parent, ...otherProjects] = projects
         // to check if there are any https links in a string
-        const re = /(\b(https?|ftp|file|omnifocus):\/\/\/?[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+
 
         const validSelection = (task?.linkedFileURLs.length) ||
             (task?.parent?.linkedFileURLs.length) ||
