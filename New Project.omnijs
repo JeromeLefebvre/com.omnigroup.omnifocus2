@@ -115,7 +115,7 @@ function existingFolders() {
         const referenceField = new Form.Field.String(
             "referenceInput",
             "Reference Link",
-            "/Users/jeromelefebvre/"
+            ""
             //"vscode://file/..."
         )
         inputForm.addField(referenceField)
@@ -176,13 +176,12 @@ function existingFolders() {
                     const url = URL.fromString(path)
                     console.info("The url created is: " + url)
                     project.note += "\n\nReference:\n"
+                    console.info(`[New project] the project note is now ${project.note}`)
                     project.note += path
-                    try {
-                        project.addLinkedFileURL(url)
-                    }
-                    catch (error){
-                        console.error(error.message)
-                    }
+                    
+                }
+                else {
+                    console.error(`[New Project] cannot deal with attached referenceURL ${referenceURL}`)
                 }
             }
             // Create new tasks here:
