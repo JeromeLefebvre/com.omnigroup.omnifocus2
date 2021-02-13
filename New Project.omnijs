@@ -3,11 +3,22 @@
     "targets": ["omnifocus"],
     "author": "Jerome Lefebvre",
     "identifier": "com.jpl.newProject",
-    "version": "0.1",
+    "version": "0.3",
     "description": "Create a new project",
     "label": "New Templated Project",
     "shortLabel": "New Templated Project"
 }*/
+
+/*
+Inputs for testing
+
+Improve omnifocus script
+I want to become king of GTD
+Tags: Laptop
+Folder: Jerome
+Fix the heck of this script
+vscode://file:///Users/jeromelefebvre/GitHub/com.omnigroup.omnifocus3
+*/
 
 function getRandomInt(min, max) {
     min = Math.ceil(min);
@@ -152,9 +163,11 @@ function existingFolders() {
             project.note = "Goal: " + formObject.values["goalInput"];
 
             var referenceURL = formObject.values["referenceInput"];
-
+            
             if (referenceURL) {
+                project.note += "\n\nReference: " + referenceURL;
                 // VS Code project folder
+                /*
                 if (referenceURL.startsWith("vscode")) {
                     var param = encodeURIComponent(referenceURL.split("vscode://file/")[1])
                     referenceURL = "vscode://file/" + param;
@@ -178,11 +191,11 @@ function existingFolders() {
                     project.note += "\n\nReference:\n"
                     console.info(`[New project] the project note is now ${project.note}`)
                     project.note += path
-                    
                 }
                 else {
                     console.error(`[New Project] cannot deal with attached referenceURL ${referenceURL}`)
                 }
+                */
             }
             // Create new tasks here:
             //const toggl = new Task("Create project in toggl", project);
