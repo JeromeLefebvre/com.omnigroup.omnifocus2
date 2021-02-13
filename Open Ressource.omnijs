@@ -3,43 +3,47 @@
     "targets": ["omnifocus"],
     "type": "action",
     "identifier": "com.jpl.Open Ressource",
-    "version": "0.1",
+    "version": "0.2",
     "description": "A plug-in that opens the first linked ressource of a task, or associated project",
     "label": "Open Ressource",
     "mediumLabel": "Open Ressource",
     "paletteLabel": "Open Ressource",
 }*/
 
+
 (() => {
-    const re = /(\b(https?|ftp|file|omnifocus|facetime):\/\/\/?[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+
+    var open = function (url) {
+        console.info(url.open ? url.string : url)
+        url.open ? url.open() : URL.fromString(url).open()
+    }
+    const re = /(\b(https?|ftp|file|omnifocus|facetime|vscode):\/\/\/?[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 
     var action = new PlugIn.Action(function (selection) {
-        const {tasks, projects} = selection
+        console.info("[Open Ressource] Opening all the founds links in the selected task and project")
+        const { tasks, projects } = selection
         const [task, ...otherTasks] = tasks
         const [project = task.parent, ...otherProjects] = projects
-        // First check anything directly attached to a task or project
-        task?.linkedFileURLs.forEach(url => url.open())
-        project?.linkedFileURLs.forEach(url => url.open())
         
-        // finally parse either the task or the project's notes
-        task?.note.match(re)?.forEach(link =>
-            URL.fromString(link).open()
-        )
-        project?.note.match(re)?.forEach(link =>
-            URL.fromString(link).open()
-        )
+        // First check anything directly attached to a task or project
+        task?.linkedFileURLs.forEach(open)
+        project?.linkedFileURLs.forEach(open)
+
+        // finally parse either the task or the project's note
+        task?.note.match(re)?.forEach(open)
+        project?.note.match(re)?.forEach(open)
     });
 
     action.validate = function (selection) {
         // tasks or projects can both be null, e.g. a folder is selected
+        
         const { tasks, projects } = selection
 
         if (!tasks.length && !projects.length)
             return false
-        
+
         const [task, ...otherTasks] = tasks
         const [project = task.parent, ...otherProjects] = projects
-        // to check if there are any https links in a string
 
 
         const validSelection = (task?.linkedFileURLs.length) ||
@@ -47,7 +51,7 @@
             (task?.note && re.test(task.note)) ||
             (project?.linkedFileURLs.length) ||
             (project?.note && re.test(project.note))
-        
+
         if (!validSelection) {
             console.error("No valid selections")
         }
