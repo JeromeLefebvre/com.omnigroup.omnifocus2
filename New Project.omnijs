@@ -152,8 +152,8 @@ function existingFolders() {
             if (newCustomerInput) {
                 console.info(`A new customer will be created with name: ${newCustomerInput}`)
                 // need to create new customer folder
-                f
-                folder = new Folder(newCustomerInput, customerFolder)
+                const customerFolder = foldersMatching("Customer")[0]
+                folder = new Folder(newCustomerInput, customerFolder);
             }
             const project = new Project(projectInput, folder);
             project.status = Project.Status.Active;
@@ -164,39 +164,8 @@ function existingFolders() {
 
             var referenceURL = formObject.values["referenceInput"];
             
-            if (referenceURL) {
-                project.note += "\n\nReference: " + referenceURL;
-                // VS Code project folder
-                /*
-                if (referenceURL.startsWith("vscode")) {
-                    var param = encodeURIComponent(referenceURL.split("vscode://file/")[1])
-                    referenceURL = "vscode://file/" + param;
-                    project.note += "\n\nReference: " + referenceURL;
-                }
-                // Mac folder or file
-                else if (referenceURL.startsWith("/")) {
-                    console.info("Creating an alias to: " + referenceURL)
-                    // To create a valid path to a folder
-                    // 1. Need to remove all spaces
-                    var path = "file://" + referenceURL.replaceAll(" ", "%20")
-                    // 2. Make sure it doesn't end with EOL
-                    path = path.trimEnd()
-                    // 3. If it is a folder, it needs to end with a slash
-                    if (!isFile(path) && path.slice(path.length - 1) != "/") {
-                        path += "/"
-                    }
-                    console.info("The path will be " + path)
-                    const url = URL.fromString(path)
-                    console.info("The url created is: " + url)
-                    project.note += "\n\nReference:\n"
-                    console.info(`[New project] the project note is now ${project.note}`)
-                    project.note += path
-                }
-                else {
-                    console.error(`[New Project] cannot deal with attached referenceURL ${referenceURL}`)
-                }
-                */
-            }
+            project.note += "\n\nReference: " + referenceURL;
+            
             // Create new tasks here:
             var tasksList = formObject.values["taskInput"];
 
@@ -210,6 +179,11 @@ function existingFolders() {
             const taskUrl = "omnifocus:///task/" + project.tasks[0].id.primaryKey;
             console.info("[New Project] opening: ${taskUrl}")
             URL.fromString(taskUrl).open();
+            if (newCustomerInput) {
+                const createFolderTasks = new Task("Create folder hiearchy by running", project)
+                createFolderTasks.note += `/Users/jeromelefebvre/GitHub/Create-Project-Folder-Hierarchy/Create-New-Customer.ps1 -AccountName ${newCustomerInput}`
+                createFolderTasks.addLinkedFileURL(URL.fromString("file:///System/Applications/Utilities/Terminal.app"))
+            }
         })
         formPromise.catch(function (err) {
             console.log("form cancelled", err.message)
