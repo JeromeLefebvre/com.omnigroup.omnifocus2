@@ -166,6 +166,12 @@ function existingFolders() {
             
             project.note += "\n\nReference: " + referenceURL;
             
+
+            var reviewIntervalObj = project.reviewInterval
+            reviewIntervalObj.steps = 7
+            reviewIntervalObj.unit = "days"
+            project.reviewInterval = reviewIntervalObj
+
             // Create new tasks here:
             var tasksList = formObject.values["taskInput"];
 
