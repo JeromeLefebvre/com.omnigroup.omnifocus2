@@ -198,7 +198,6 @@ function existingFolders() {
                 */
             }
             // Create new tasks here:
-            //const toggl = new Task("Create project in toggl", project);
             var tasksList = formObject.values["taskInput"];
 
             const tasksName = tasksList.split("\n");
@@ -206,10 +205,10 @@ function existingFolders() {
                 if (task != "")
                     new Task(task, project)
             });
-            
-            project.document.windows[0].perspective = Perspective.BuiltIn.Projects
-            document.windows[0].selectObjects([project]);
-            const taskUrl = "omnifocus:///task/" + toggl.id.primaryKey;
+            //project.document.windows[0].perspective = Perspective.BuiltIn.Projects
+            //document.windows[0].selectObjects([project]);
+            const taskUrl = "omnifocus:///task/" + project.tasks[0].id.primaryKey;
+            console.info("[New Project] opening: ${taskUrl}")
             URL.fromString(taskUrl).open();
         })
         formPromise.catch(function (err) {
