@@ -2,12 +2,12 @@
     "author": "Jerome Lefebvre",
     "targets": ["omnifocus"],
     "type": "action",
-    "identifier": "com.jpl.Open Ressource",
+    "identifier": "com.jpl.Open Ressources",
     "version": "0.2",
-    "description": "A plug-in that opens the first linked ressource of a task, or associated project",
-    "label": "Open Ressource",
-    "mediumLabel": "Open Ressource",
-    "paletteLabel": "Open Ressource",
+    "description": "A plug-in that opens the all linked ressourcesof a task, or associated project",
+    "label": "Open Ressources",
+    "mediumLabel": "Open Ressources",
+    "paletteLabel": "Open Ressources",
 }*/
 
 
@@ -24,7 +24,7 @@
         const { tasks, projects } = selection
         const [task, ...otherTasks] = tasks
         const [project = task.parent, ...otherProjects] = projects
-        
+
         // First check anything directly attached to a task or project
         task?.linkedFileURLs.forEach(open)
         project?.linkedFileURLs.forEach(open)
@@ -35,8 +35,7 @@
     });
 
     action.validate = function (selection) {
-        // tasks or projects can both be null, e.g. a folder is selected
-        
+        // Need to have a task or a project folder in which either contains a link or attached url
         const { tasks, projects } = selection
 
         if (!tasks.length && !projects.length)
