@@ -17,7 +17,7 @@
         console.info(url.open ? url.string : url)
         url.open ? url.open() : URL.fromString(url).open()
     }
-    const re = /(\b(https?|ftp|file|omnifocus|facetime|vscode):\/\/\/?[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    const re = /(\b(https?|ftp|file|omnifocus|facetime|vscode|postman|hook):\/\/\/?[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 
     var action = new PlugIn.Action(function (selection) {
         console.info("[Open Ressource] Opening all the founds links in the selected task and project")
