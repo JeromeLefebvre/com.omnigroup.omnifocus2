@@ -1,0 +1,50 @@
+/*{
+    "author": "Jerome Lefebvre",
+    "targets": ["omnifocus"],
+    "type": "action",
+    "identifier": "com.mycompany.ShowAnyRandom",
+    "version": "0.4",
+    "description": "Return a random task from anywhere",
+    "label": "Random Any Task",
+    "shortLabel": "Random Any Task"
+}*/
+(() => {
+    Array.prototype.random = function () {
+        return this[Math.floor(Math.random() * this.length)];
+    }
+    function ilog(message) {
+        const current = new Date();
+        const timestamp = current.getHours() + ":" + current.getMinutes() + ":" + current.getSeconds()
+        console.info("[radnom: " + timestamp + "] " + message)
+    }
+
+    function selectAndShowRandomTask(tagName) {
+        const task = randomTask(tagName)
+        const taskUrl = "omnifocus:///task/" + task.id.primaryKey
+        ilog("Opening: " + taskUrl)
+        URL.fromString(taskUrl).open()
+    }
+
+    function randomTask() {
+        // Select a random tag
+        ilog("About to select a random tag")
+        const tag = tagsMatching("").filter(tag => tag.availableTasks.filter(task => !task.project).length).random()
+        // return a random task
+        ilog("Randomly selected tag: " + tag.name)
+        let tasks = tag.availableTasks
+        //console.info(tasks)
+        tasks = tasks.filter(task => !task.project)
+        ilog("number of possible tasks: " + tasks.length)
+        const task = tasks.random()
+        ilog("Randomly selected task: " + task.name)
+        
+        return task
+    }
+
+    const action = new PlugIn.Action(
+        function (selection) {
+            selectAndShowRandomTask();
+        }
+    );
+    return action;
+})(); 
