@@ -26,10 +26,6 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function isFile(pathname) {
-    return pathname.split('/').pop().indexOf('.') > -1;
-}
-
 function tagsName(tags) {
     var tagsName = [];
     tags.forEach(tag => {
@@ -166,7 +162,6 @@ function existingFolders() {
             
             project.note += "\n\nReference: " + referenceURL;
             
-
             var reviewIntervalObj = project.reviewInterval
             reviewIntervalObj.steps = 7
             reviewIntervalObj.unit = "days"
