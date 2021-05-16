@@ -1,0 +1,75 @@
+/*{
+    "type": "action",
+    "targets": ["omnifocus"],
+    "author": "Jerome Lefebvre",
+    "identifier": "com.jpl.backlog",
+    "version": "0.1",
+    "description": "Create Backlog items",
+    "label": "Backlog",
+    "shortLabel": "Backlog"
+}*/
+(() => {
+    function ilog(message) {
+        const current = new Date();
+        const hours = ("0" + current.getHours()).slice(-2);
+        const minutes = ("0" + current.getMinutes()).slice(-2);
+        const seconds = ("0" + current.getSeconds()).slice(-2);
+        const timestamp = hours + ":" + minutes + ":" + seconds
+        console.info("[backlog: " + timestamp + "] " + message)
+    }
+
+    var action = new PlugIn.Action(function (selection, sender) {
+        ilog("Starting up...");
+        // action code
+        // selection options: tasks, projects, folders, tags, allObjects
+
+
+        const inputForm = new Form()
+        inputForm.addField(
+            new Form.Field.String(
+                "count",
+                "How many?",
+                "2"
+            )
+        )
+
+        inputForm.addField(
+            new Form.Field.String(
+                "item",
+                "What is the item?",
+                "Deal with one life email"
+            )
+        )
+        
+        formPrompt = "What is the backlog?"
+        formPromise = inputForm.show(formPrompt, "Continue")
+
+        inputForm.validate = function (formObject) {
+            ilog("No issues with the fields")
+            // Todo: check if the input is a int
+            const count = formObject.values["count"]
+            const item = formObject.values["item"]
+            return parseInt(count) != NaN && item != ""
+        }
+
+        formPromise.then(function (formObject) {
+            ilog("Got input.." + formObject.values["count"])
+            ilog("Got input.." + formObject.values["item"])
+            const count = parseInt(formObject.values["count"]);
+            const life = projectsMatching("Life - Single tasks")[0]
+
+            for (let i = 0; i < count; i++) {
+                new Task(formObject.values["item"], life);
+            }
+        })
+        formPromise.catch(function (err) {
+            ilog("form cancelled", err.message)
+        })
+    })
+
+    action.validate = function (selection, sender) {
+        return true
+    }
+
+    return action
+})()

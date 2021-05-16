@@ -182,7 +182,7 @@ function existingFolders() {
             URL.fromString(taskUrl).open();
             if (newCustomerInput) {
                 const createFolderTasks = new Task("Create folder hiearchy by running", project)
-                createFolderTasks.note += `/Users/jeromelefebvre/GitHub/Create-Project-Folder-Hierarchy/Create-New-Customer.ps1 -AccountName ${newCustomerInput}`
+                createFolderTasks.note += `/Users/jeromelefebvre/GitHub/Create-Project-Folder-Hierarchy/Create-New-Customer.ps1 -AccountName "${newCustomerInput}"`
                 createFolderTasks.addLinkedFileURL(URL.fromString("file:///System/Applications/Utilities/Terminal.app"))
             }
         })

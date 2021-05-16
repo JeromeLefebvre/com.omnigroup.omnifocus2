@@ -15,7 +15,7 @@
     function ilog(message) {
         const current = new Date();
         const timestamp = current.getHours() + ":" + current.getMinutes() + ":" + current.getSeconds()
-        console.info("[radnom: " + timestamp + "] " + message)
+        console.info("[random: " + timestamp + "] " + message)
     }
 
     function selectAndShowRandomTask(tagName) {
