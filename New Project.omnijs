@@ -26,14 +26,8 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function tagsName(tags) {
-    var tagsName = [];
-    tags.forEach(tag => {
-        var tagName = tag.parent ? tag.parent.name + ":" : ""
-        tagName += tag.name,
-            tagsName.push(tagName);
-    });
-    return tagsName;
+function formTagName(tags) {
+    return tags.map(tag => tag.parent ? tag.parent.name + ":" + tag.name : tag.name)
 }
 
 function existingTags() {
@@ -49,8 +43,8 @@ function existingTags() {
 
 function existingFolders() {
     var existing = []
-    folderNamed("Life").folders.forEach( folder => existing.push(folder));
-    var OSIsoftFolder = folderNamed("OSIsoft")
+    folderNamed("Life").folders.forEach(folder => existing.push(folder));
+    const OSIsoftFolder = folderNamed("OSIsoft")
     existing.push(OSIsoftFolder.folderNamed("OSIsoft"))
     existing.push(OSIsoftFolder.folderNamed("Training"))
     OSIsoftFolder.folderNamed("Customers").folders.forEach(folder => existing.push(folder))
@@ -62,8 +56,8 @@ function existingFolders() {
         const inputForm = new Form()
         const projectField = new Form.Field.String(
             "projectInput",
-            "Project Name",
-            "new project" + getRandomInt(1, 100)
+            "Project Name (as an action) V2",
+            "Is the presentation given?" + getRandomInt(1, 100)
         )
         inputForm.addField(projectField)
 
@@ -81,7 +75,7 @@ function existingFolders() {
             "tagInput",
             "Tags",
             tagsAsFlatList,
-            tagsName(tagsAsFlatList),
+            formTagName(tagsAsFlatList),
             tagsAsFlatList[1]
         )
         inputForm.addField(tagField);
@@ -104,9 +98,9 @@ function existingFolders() {
             null
         )
         inputForm.addField(newCustomerField)
-                
-        // TASK
-        const tasksField = new Form.Field.String(
+
+        // TASKS
+        inputForm.addField(new Form.Field.String(
             "taskInput",
             "First Task",
             `task1
@@ -115,8 +109,7 @@ function existingFolders() {
 
 
 `
-        )
-        inputForm.addField(tasksField)
+        ))
 
         // REFERENCE
         const referenceField = new Form.Field.String(
@@ -126,41 +119,49 @@ function existingFolders() {
             //"vscode://file/..."
         )
         inputForm.addField(referenceField)
-        
+
         formPrompt = "Create a new project"
         formPromise = inputForm.show(formPrompt, "Continue")
 
         inputForm.validate = function (formObject) {
 
-            const {projectInput, folderInput, newCustomerInput} = formObject.values;
+            const { projectInput, folderInput, newCustomerInput } = formObject.values;
             const noExistingProject = folderInput.projectNamed(projectInput) == null;
             //console.info("The selected folder is : " + folderInput.name)
-            var whenNewCustomerCreated = (folderInput.name != ".") || newCustomerInput
+            const whenNewCustomerCreated = (folderInput.name != ".") || newCustomerInput
+
             return noExistingProject && whenNewCustomerCreated
         }
 
         formPromise.then(function (formObject) {
             console.info("New project will be created");
-            
-            const {projectInput, folderInput, newCustomerInput, tagInput} = formObject.values;
-            var folder = folderInput;
 
+            const { projectInput, folderInput, newCustomerInput, tagInput } = formObject.values;
+            var folder = folderInput;
+            
             if (newCustomerInput) {
                 console.info(`A new customer will be created with name: ${newCustomerInput}`)
                 // need to create new customer folder
-                const customerFolder = foldersMatching("Customer")[0]
+                const customerFolder = foldersMatching("Customers")[0]
                 folder = new Folder(newCustomerInput, customerFolder);
+                
             }
-            const project = new Project(projectInput, folder);
-            project.status = Project.Status.Active;
-            project.containsSingletonActions = false;
+
+            const OneDrivePath = 'file:///Users/jeromelefebvre/OneDrive%20-%20OSIsoft,%20LLC/Customers/'
+            const folderReference = newCustomerInput? URL.fromString(`${OneDrivePath}${newCustomerInput}`) : URL.fromString(`${OneDrivePath}${folderInput['name']}`)
+           
+            const project = new Project(projectInput, folder)
+            project.status = Project.Status.Active
+            project.containsSingletonActions = false
 
             project.addTag(tagInput);
             project.note = "Goal: " + formObject.values["goalInput"];
 
             var referenceURL = formObject.values["referenceInput"];
-            
+
             project.note += "\n\nReference: " + referenceURL;
+            project.note += folderReference.string
+            //project.addLinkedFileURL(folderReference);
             
             var reviewIntervalObj = project.reviewInterval
             reviewIntervalObj.steps = 7
@@ -175,6 +176,7 @@ function existingFolders() {
                 if (task != "")
                     new Task(task, project)
             });
+
             //project.document.windows[0].perspective = Perspective.BuiltIn.Projects
             //document.windows[0].selectObjects([project]);
             const taskUrl = "omnifocus:///task/" + project.tasks[0].id.primaryKey;
@@ -184,7 +186,9 @@ function existingFolders() {
                 const createFolderTasks = new Task("Create folder hiearchy by running", project)
                 createFolderTasks.note += `/Users/jeromelefebvre/GitHub/Create-Project-Folder-Hierarchy/Create-New-Customer.ps1 -AccountName "${newCustomerInput}"`
                 createFolderTasks.addLinkedFileURL(URL.fromString("file:///System/Applications/Utilities/Terminal.app"))
+                new Task("Add in the folder reference created by the script", project)
             }
+
         })
         formPromise.catch(function (err) {
             console.log("form cancelled", err.message)
